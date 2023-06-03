@@ -16,6 +16,7 @@ import eth_utils
 import eth_account
 
 from models import SimpleModel
+from transaction_features import EtherScan
 
 
 INFURA_URL='https://mainnet.infura.io/v3/5c92864a308b45b6a8c3559b63cb5b38'
@@ -67,14 +68,16 @@ def generate_proof(input_data, output):
 
 
 async def get_features(address):
-    # TODO(kay): make request to the graph server and parse into features.
-    return np.random.randn(16)
+    etherscan = EtherScan(address)
+    features = await etherscan.get_features_list()
+    assert len(features) == 16, 'Expect 16 features'
+    return features
 
 
 async def check_fraud(input_data):
     with torch.no_grad():
         input_data = torch.tensor(input_data, dtype=torch.float32)
-        output = model(input_data).numpy()
+        output = model(input_data).cpu().numpy()
     score = output[0]
     proof = generate_proof(input_data, output)
     return score, proof
@@ -173,7 +176,6 @@ async def root(rpc: RpcRequest):
                     'resut': tx_hash,
                     'id': rpc.id
                 }
-
     print('Relaying rpc message %s to infura' % str(rpc))
     async with httpx.AsyncClient() as client:
         response = await client.post(

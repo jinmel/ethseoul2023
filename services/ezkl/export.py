@@ -51,4 +51,4 @@ def export(torch_model, input_shape=None, input_array=None, onnx_filename="netwo
     json.dump( data, open( input_filename, 'w' ) )
 
     # Runs a forward operation to quantize inputs
-    ezkl_lib.forward(input_filename, onnx_filename, input_filename)
+    # ezkl_lib.forward(input_filename, onnx_filename, input_filename)
