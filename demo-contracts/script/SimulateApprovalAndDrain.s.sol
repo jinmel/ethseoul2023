@@ -8,18 +8,21 @@ import "../src/NASNFTContractUSDTDrain.sol";
 
 contract SimulateScript is Script {
     function run() public {
-        vm.startBroadcast(0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356);
+        vm.startBroadcast();
 
-        YAUSDT yausdt = YAUSDT(address(0x5FbDB2315678afecb367f032d93F642f64180aa3));
-        NASNFTContractUSDTDrain nasnft = NASNFTContractUSDTDrain(address(0x71C95911E9a5D330f4D621842EC243EE1343292e));
+        // Initialise contracts
+        YAUSDT yausdt = YAUSDT(address(0xdBB0d62e8aBa9c0d9aA1F5d2aB295Be9E96c2006));
+        NASNFTContractUSDTDrain nasnft = NASNFTContractUSDTDrain(address(0x2b681DCAF5B298751d9c37AD454707593F0A635B));
 
-        console.log(yausdt.balanceOf(address(0x14dC79964da2C08b23698B3D3cc7Ca32193d9955)));
-        yausdt.approve(address(0x71C95911E9a5D330f4D621842EC243EE1343292e), 1000000000000000000000);
-        console.log(yausdt.allowance(address(0x14dC79964da2C08b23698B3D3cc7Ca32193d9955), address(0x71C95911E9a5D330f4D621842EC243EE1343292e)));
+        // yausdt.transfer(address(0xF69DDf6379a345089bB05ef6713FE15EFaf4E871), 1000000000000000000000);
 
+        // Approval
+        console.log("user usdt balance before", yausdt.balanceOf(address(0x9C64E2B8b1e1aE370f833F37B3690fcf1a2B6859)));
+        yausdt.approve(address(0x2b681DCAF5B298751d9c37AD454707593F0A635B), 1000000000000000000000000); // 100k
+
+        // Drain
         nasnft.mint();
-        console.log(nasnft.balanceOf(address(0x14dC79964da2C08b23698B3D3cc7Ca32193d9955)));
-        console.log(yausdt.balanceOf(address(0x14dC79964da2C08b23698B3D3cc7Ca32193d9955)));
+        console.log("user usdt balance after:", yausdt.balanceOf(address(0x9C64E2B8b1e1aE370f833F37B3690fcf1a2B6859)));
 
         vm.stopBroadcast();
     }

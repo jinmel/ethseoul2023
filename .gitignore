@@ -150,3 +150,7 @@ yarn.lock
 
 **/.python-version
 __pycache__/
+
+# wallet
+wallet.txt
+broadcast/
