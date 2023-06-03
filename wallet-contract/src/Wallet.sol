@@ -53,11 +53,13 @@ contract Wallet {
             transaction.data
         );
         require(success);
-    }
+    } 
 
     /// Only can be called by the owner of this wallet to perform general action
     /// eg. withdrawal of tokens
-    function executeEip712(TransactionAction memory action) external {}
+    function executeEip712(TransactionAction memory action) external {
+        _verifyUserActions(action, )
+    }
 
     function _checkTxRawSig(
         TransactionObject memory transaction
