@@ -5,8 +5,8 @@ import "./Wallet.sol";
 import "./IVerifier.sol";
 
 contract WalletFactory {
-    address owner;
-    IVerifier verifier;
+    address public owner;
+    IVerifier public verifier;
 
     constructor(address _owner, IVerifier _verifier) {
         owner = _owner;
@@ -20,9 +20,14 @@ contract WalletFactory {
 
     event DeployedWallet(address indexed owner, address indexed walletAddress);
 
-    function deploy(address walletOwner) external { // onlyOwner should be used here in a production setting
+    function deploy(address walletOwner) external {
+        // onlyOwner should be used here in a production setting
         address walletAddress = address(new Wallet(verifier, owner));
 
         emit DeployedWallet(walletOwner, walletAddress);
+    }
+
+    function changeVerifier(IVerifier _verifier) external {
+        verifier = _verifier;
     }
 }

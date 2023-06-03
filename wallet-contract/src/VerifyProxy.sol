@@ -19,6 +19,11 @@ contract Proxy {
     constructor(address _implementation) {
         contractImpl = _implementation;
     }
+
+    function changeImplementation(address _implementation) external {
+        contractImpl = _implementation;
+    }
+
     /**
      * @dev Delegates the current call to `implementation`.
      *

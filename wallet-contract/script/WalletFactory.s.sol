@@ -46,3 +46,5 @@ contract WalletScript is Script {
         vm.stopBroadcast();
     }
 }
+
+// forge script script/WalletFactory.s.sol:WalletScript -vvv --rpc-url https://goerli.infura.io/v3/0ff5be6b14cc428f840236cacc7bec71  --broadcast --verify
