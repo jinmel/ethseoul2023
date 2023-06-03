@@ -53,12 +53,19 @@ contract Wallet {
             transaction.data
         );
         require(success);
-    } 
+    }
 
     /// Only can be called by the owner of this wallet to perform general action
     /// eg. withdrawal of tokens
-    function executeEip712(TransactionAction memory action) external {
-        _verifyUserActions(action, )
+    function executeEip712(
+        TransactionAction memory action,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        _verifyUserActions(action, v, r, s);
+        (bool success,) =  action.address.call{value: action.value}(action.data);
+        require(success);
     }
 
     function _checkTxRawSig(
@@ -88,7 +95,12 @@ contract Wallet {
         TransactionAction memory action
     ) internal view returns (bytes32) {
         bytes32 userVoteHash = keccak256(
-            abi.encode(USERACTION_TYPEHASH, action.destContract, action.value, action.data)
+            abi.encode(
+                USERACTION_TYPEHASH,
+                action.destContract,
+                action.value,
+                action.data
+            )
         );
         bytes32 domainSeparator = keccak256(
             abi.encode(
