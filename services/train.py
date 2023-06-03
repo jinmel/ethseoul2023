@@ -134,7 +134,7 @@ def main(_):
     X, y = load_data('./transaction_dataset.csv')
     X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2)
-    # scaler, X_train, X_test = scale(X_train, X_test)
+    scaler, X_train, X_test = scale(X_train, X_test)
     oversample = SMOTE()
     X_train_resample, y_train_resample = oversample.fit_resample(
             X_train, y_train)
@@ -143,14 +143,15 @@ def main(_):
     print(f'best_model acc: {best_acc}')
     logging.info('Writing onnx file to %s', FLAGS.output_dir)
 
-    # input_array = scaler.transform([[0.01, 0.01, 7490.75, 0.01, 9999.0, 1.0, 80000.0,
-    #                                 17.567399978637695, 0.01, 0.01, 892546.375, 99022241792.0,
-    #                                 110746.75, 99022348288.0, 7.0, 39.0]])
+    input_array = scaler.transform([[0.01, 0.01, 7490.75, 0.01, 9999.0, 1.0, 80000.0,
+                                    17.567399978637695, 0.01, 0.01, 892546.375, 99022241792.0,
+                                    110746.75, 99022348288.0, 7.0, 39.0]])
     # input_array = 0.1 * np.random.randn(1, 16)
-    # print(input_array)
+    print(input_array)
     # input_array = np.clip(np.round(input_array, 2), 0, 1)
-    # print(input_array)
-    # input_array = torch.from_numpy(input_array).type(torch.float32)
+    input_array = np.clip(input_array, 0, 1)
+    print(input_array)
+    input_array = torch.from_numpy(input_array).type(torch.float32)
     # print(type(input_array))
     # print(input_array)
     # print(input_array.shape)
@@ -174,8 +175,8 @@ def main(_):
     model.eval()
     with torch.no_grad():
         export(model,
-            input_shape=[16],
-            # input_array=input_array,
+            # input_shape=[16],
+            input_array=input_array,
             onnx_filename=os.path.join(FLAGS.output_dir, 'model.onnx'),
             input_filename=os.path.join(FLAGS.output_dir, 'input.json'))
 

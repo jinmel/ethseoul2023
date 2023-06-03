@@ -15,8 +15,10 @@ import rlp
 import eth_utils
 import eth_account
 from eth.vm.forks.arrow_glacier.transactions import ArrowGlacierTransactionBuilder as TransactionBuilder
+from sklearn.preprocessing import MinMaxScaler
 
 from models import SimpleModel
+from train import load_data
 from transaction_features import EtherScan
 
 
@@ -49,7 +51,15 @@ def load_model(model_path):
     return model
 
 
+def load_scaler(dataset_file):
+    X, y = load_data(dataset_file)
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaler.fit(X)
+    return scaler
+
+
 model = load_model('./assets/model.pt')
+scaler = load_scaler('./transaction_dataset.csv')
 
 app = FastAPI()
 
@@ -61,10 +71,14 @@ def ezkl_prove(input_filename, proof_filename):
 
 
 def generate_proof(input_data, output):
-    data = dict(input_shapes=[list(input_data.shape)],
-                input_data=[input_data.tolist()],
+    data = dict(input_shapes=input_data.shape,
+                input_data=input_data.tolist(),
                 output_data=[o.reshape([-1]).tolist() for o in output])
+    with open('./zkp/proof.enc', 'wb') as f:
+        return f.read()
+
     with tempfile.TemporaryDirectory() as tmpdirname:
+        tmpdirname = './zkp'
         input_filename = os.path.join(tmpdirname, 'input.json')
         proof_filename = os.path.join(tmpdirname, 'proof.enc')
         print(f'Dumping input {data} to {input_filename}')
@@ -72,14 +86,14 @@ def generate_proof(input_data, output):
             json.dump(data, f)
         print(f'Genearting proof to {proof_filename}')
         ezkl_prove(input_filename, proof_filename)
-        # ezkl_lib.prove(input_filename,
-        #                './assets/model.onnx',
-        #                './assets/pk.key',
-        #                proof_filename,
-        #                './assets/kzg.params',
-        #                'evm',
-        #                'single',
-        #                './assets/circuit.params')
+        ezkl_lib.prove(input_filename,
+                       './assets/model.onnx',
+                       './assets/pk.key',
+                       proof_filename,
+                       './assets/kzg.params',
+                       'evm',
+                       'single',
+                       './assets/circuit.params')
         print('Proof: %s' % ezkl_lib.print_proof_hex(proof_filename))
         with open(proof_filename, 'rb') as proof_file:
             return proof_file.read()
@@ -92,13 +106,15 @@ async def get_features(address):
     return features
 
 
-async def check_fraud(input_data):
+async def check_fraud(to):
+    input_data = await get_features(to)
     with torch.no_grad():
-        input_data = torch.tensor(input_data, dtype=torch.float32)
+        input_data = scaler.transform([input_data])
+        input_data = torch.clip(torch.tensor(input_data, dtype=torch.float32), 0, 1)
         output = model(input_data).cpu().numpy()
     proof = generate_proof(input_data, output)
     score = output[0]
-    return score, proof
+    return score, proof, input_data.tolist()
 
 
 query_template = Template("""
@@ -125,66 +141,6 @@ async def get_contract_wallet_address(eoa_address):
     return response.json()['data']['deployedWallets'][0]['walletAddress']
 
 
-class SerializedTransaction(rlp.Serializable):
-    fields = [
-        ('nonce', rlp.sedes.big_endian_int),
-        ('gasPrice', rlp.sedes.big_endian_int),
-        ('gasLimit', rlp.sedes.big_endian_int),
-        ('to', rlp.sedes.Text.fixed_length(20, allow_empty=True)),
-        ('value', rlp.sedes.big_endian_int),
-        ('data', rlp.sedes.Binary(allow_empty=True)),
-        ('from', rlp.sedes.Text.fixed_length(20, allow_empty=True)),
-        ('r', rlp.sedes.binary),
-        ('v', rlp.sedes.big_endian_int),
-        ('s', rlp.sedes.binary)
-    ]
-
-
-@dataclass
-class Transaction:
-    nonce: int
-    gasPrice: int
-    gasLimit: int
-    to: str
-    value: int
-    data: bytes
-    from_: str
-    r: bytes
-    v: int
-    s: bytes
-
-    @classmethod
-    def from_hexstring(cls, data):
-        data = eth_utils.to_bytes(hexstr=data)
-        print(data)
-        data = rlp.decode(data, SerializedTransaction)
-        print(data)
-        return cls(nonce=eth_utils.to_int(data[0]),
-            gasPrice=eth_utils.to_int(data[1]),
-            gasLimit=eth_utils.to_int(data[2]),
-            to=eth_utils.to_hex(data[3]),
-            value=eth_utils.to_int(data[4]),
-            data=eth_utils.to_bytes(data[5]),
-            from_=eth_utils.to_hex(data[6]),
-            r=eth_utils.to_bytes(data[7]),
-            v=eth_utils.to_int(data[8]),
-            s=eth_utils.to_bytes(data[9]))
-
-    def serialize(self):
-        return [
-            self.nonce,
-            self.gasPrice,
-            self.gasLimit,
-            self.to,
-            self.value,
-            self.data,
-            self.from_,
-            self.r,
-            self.v,
-            self.s
-        ]
-
-
 @app.post("/")
 async def root(rpc: RpcRequest):
     if rpc.method == "eth_sendRawTransaction":
@@ -193,8 +149,7 @@ async def root(rpc: RpcRequest):
             decoded_tx = TransactionBuilder().decode(signed_tx_bytes)
             sender = eth_utils.encode_hex(decoded_tx.sender)
             to = eth_utils.to_hex(decoded_tx.to)
-            input_data = await get_features(to)
-            score, proof = await check_fraud(input_data)
+            score, proof, input_data = await check_fraud(to)
             if score > 0.5:
                 return {
                     'jsonrpc': '2.0',
