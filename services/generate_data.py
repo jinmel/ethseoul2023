@@ -93,8 +93,12 @@ class Features:
     def get_feature(self, feature_name):
         return self.feature_dict[feature_name]
 
+    def get_features_value_list(self):
+        return list(self.feature_dict.values())
+
 
 # example
 features = Features('0x00062d1dd1afb6fb02540ddad9cdebfe568e0d89')
 print(features.get_features_dict())
 print(features.get_feature(' ERC20 uniq rec token name'))
+print(features.get_features_value_list())
