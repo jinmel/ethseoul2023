@@ -64,7 +64,9 @@ contract Wallet {
         bytes32 s
     ) external {
         _verifyUserActions(action, v, r, s);
-        (bool success,) =  action.address.call{value: action.value}(action.data);
+        (bool success, ) = action.address.call{value: action.value}(
+            action.data
+        );
         require(success);
     }
 
@@ -115,4 +117,6 @@ contract Wallet {
                 abi.encodePacked("\x19\x01", domainSeparator, userVoteHash)
             );
     }
+
+    receive() external payable {}
 }
