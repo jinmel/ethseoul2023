@@ -176,7 +176,7 @@ async def root(rpc: RpcRequest):
                 tx_hash = w3.eth.send_transaction(tx)
                 return {
                     'jsonrpc': '2.0',
-                    'resut': tx_hash,
+                    'result': tx_hash,
                     'id': rpc.id
                 }
     print('Relaying rpc message %s to infura' % str(rpc))
