@@ -1,3 +1,4 @@
+import { MouseEventHandler } from "react";
 import styled from "styled-components";
 
 const Btn = styled.button`
@@ -37,14 +38,12 @@ const Btn = styled.button`
   }
 `;
 
-const Button: React.FC<{ text: string; link: string }> = ({ text, link }) => {
-  return (
-    <Btn>
-      <a href={link} aria-label={text} target="_blank" rel="noreferrer">
-        {text}
-      </a>
-    </Btn>
-  );
+const Button: React.FC<{
+  text: string;
+  onClick: MouseEventHandler<HTMLButtonElement>;
+  isDisabled?: boolean;
+}> = ({ text, onClick, isDisabled=false }) => {
+  return <Btn onClick={onClick} disabled={isDisabled}>{text}</Btn>;
 };
 
 export default Button;
