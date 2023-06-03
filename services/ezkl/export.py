@@ -20,12 +20,7 @@ def export(torch_model, input_shape=None, input_array=None, onnx_filename="netwo
     if input_array is None:
         x = 0.1*torch.rand(1,*input_shape, requires_grad=True)
     else:
-        x = torch.tensor(input_array)
-        if input_shape is not None:
-            assert tuple(input_shape) == x.shape
-        new_shape = tuple([1]+list(x.shape))
-        x = torch.reshape(x,new_shape)
-
+        x = input_array
 
     torch_out = torch_model(x)
 

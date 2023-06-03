@@ -17,7 +17,8 @@ fi
 cd ./assets
 echo "Starting to generate verifier contract"
 
-ezkl setup -D input.json -M model.onnx --params-path=kzg.params --vk-path=vk.key --pk-path=pk.key --circuit-params-path=circuit.params
+ezkl setup -D input.json -M model.onnx --params-path=kzg.params --vk-path=vk.key --pk-path=pk.key --circuit-params-path=circuit.params -B 19 -K 20
+
 
 # gen proof
 ezkl prove --transcript=evm -M model.onnx -D input.json --proof-path model.pf --pk-path pk.key --params-path=kzg.params --circuit-params-path=circuit.params

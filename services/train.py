@@ -12,7 +12,9 @@ import tqdm
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from imblearn.over_sampling import SMOTE
+import torch
 
 from ezkl import export
 from models import SimpleModel
@@ -120,10 +122,19 @@ def train(model, X_train, y_train, X_val, y_val):
     return best_acc
 
 
+def scale(X_train, X_test):
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaler.fit(X_train)
+    X_train_scaled = scaler.transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    return scaler, X_train_scaled, X_test_scaled
+
+
 def main(_):
     X, y = load_data('./transaction_dataset.csv')
     X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2)
+    # scaler, X_train, X_test = scale(X_train, X_test)
     oversample = SMOTE()
     X_train_resample, y_train_resample = oversample.fit_resample(
             X_train, y_train)
@@ -131,9 +142,43 @@ def main(_):
     best_acc = train(model, X_train_resample, y_train_resample, X_test, y_test)
     print(f'best_model acc: {best_acc}')
     logging.info('Writing onnx file to %s', FLAGS.output_dir)
-    export(model, input_shape=[16],
-           onnx_filename=os.path.join(FLAGS.output_dir, 'model.onnx'),
-           input_filename=os.path.join(FLAGS.output_dir, 'input.json'))
+
+    # input_array = scaler.transform([[0.01, 0.01, 7490.75, 0.01, 9999.0, 1.0, 80000.0,
+    #                                 17.567399978637695, 0.01, 0.01, 892546.375, 99022241792.0,
+    #                                 110746.75, 99022348288.0, 7.0, 39.0]])
+    # input_array = 0.1 * np.random.randn(1, 16)
+    # print(input_array)
+    # input_array = np.clip(np.round(input_array, 2), 0, 1)
+    # print(input_array)
+    # input_array = torch.from_numpy(input_array).type(torch.float32)
+    # print(type(input_array))
+    # print(input_array)
+    # print(input_array.shape)
+    # input_array = input_array[0].tolist()
+
+    # input_array = 0.1 * torch.rand(1, *[16])
+
+    # input_array = [0.0, 0.0, 490.75, 0.0, 9999.0, 1.0, 0.0,
+    #                17.567399, 0.0, 0.0, 892546.375, 92.0,
+    #                110746.75, 9902, 7.0, 39.0]
+
+    # input_array = [10.13] * 16
+
+    # input_array = torch.tensor([0.00001, 0.00001, 1287490.75, 0.00001, 9999.0, 1.0, 80000.0,
+    #                17.567399978637695, 0.0001, 0.00001, 892546.375, 99022241792.0,
+    #                110746.75, 99022348288.0, 7.0, 39.0], dtype=torch.float32)
+
+    # input_array = 0.1*torch.rand(1,*[16], requires_grad=False)
+
+    # input_array = 0.1*torch.rand(1,*[16], requires_grad=True)
+    model.eval()
+    with torch.no_grad():
+        export(model,
+            input_shape=[16],
+            # input_array=input_array,
+            onnx_filename=os.path.join(FLAGS.output_dir, 'model.onnx'),
+            input_filename=os.path.join(FLAGS.output_dir, 'input.json'))
+
     torch.save(model.state_dict(), os.path.join(FLAGS.output_dir, 'model.pt'))
 
 
