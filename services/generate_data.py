@@ -11,6 +11,26 @@ class Features:
         self.address = address
         self.__set_normal_transaction_features()
         self.__set_erc_features()
+        self.feature_dict = {
+            'Avg min between sent tnx': self.avg_min_between_sent_tnx,
+            'Avg min between received tnx': self.avg_min_between_received_tnx,
+            'Time Diff between first and last (Mins)': self.time_diff_between_first_and_last,
+            'Sent tnx': self.sent_tnx,
+            'Received Tnx': self.received_tnx,
+            'Number of Created Contracts': self.number_of_created_contracts,
+            'max value received ': self.max_value_received,
+            'avg val received': self.avg_val_received,
+            'avg val sent': self.avg_val_sent,
+            'min value sent to contract': self.min_value_sent_to_contract,
+            'total Ether sent': self.total_ether_sent,
+            'total ether balance': self.total_ether_balance,
+            ' ERC20 total Ether received': self.erc20_total_ether_received,
+            ' ERC20 total ether sent': self.erc20_total_ether_sent,
+            ' ERC20 total Ether sent contract': self.erc20_total_ether_sent_contract,
+            ' ERC20 uniq sent addr': self.erc20_uniq_sent_addr,
+            ' ERC20 uniq sent addr.1': self.erc20_uniq_sent_addr,
+            ' ERC20 uniq rec token name': self.erc20_uniq_rec_token_name
+        }
 
     def __set_normal_transaction_features(self):
         self.__normal_transactions_json = requests.get(
@@ -67,28 +87,14 @@ class Features:
         self.erc20_uniq_sent_addr = len(unique_sent_addr)
         self.erc20_uniq_rec_token_name = len(unique_token_name)
 
-    def get_features_list(self):
-        return [
-            self.avg_min_between_sent_tnx,
-            self.avg_min_between_received_tnx,
-            self.time_diff_between_first_and_last,
-            self.sent_tnx,
-            self.received_tnx,
-            self.number_of_created_contracts,
-            self.max_value_received,
-            self.avg_val_received,
-            self.avg_val_sent,
-            self.min_value_sent_to_contract,
-            self.total_ether_sent,
-            self.total_ether_balance,
-            self.erc20_total_ether_received,
-            self.erc20_total_ether_sent,
-            self.erc20_total_ether_sent_contract,
-            self.erc20_uniq_sent_addr,
-            self.erc20_uniq_rec_token_name
-        ]
+    def get_features_dict(self):
+        return self.feature_dict
+
+    def get_feature(self, feature_name):
+        return self.feature_dict[feature_name]
 
 
 # example
-temp = Features('0x00009277775ac7d0d59eaad8fee3d10ac6c805e8')
-print(temp.get_features_list())
+features = Features('0x00062d1dd1afb6fb02540ddad9cdebfe568e0d89')
+print(features.get_features_dict())
+print(features.get_feature(' ERC20 uniq rec token name'))
