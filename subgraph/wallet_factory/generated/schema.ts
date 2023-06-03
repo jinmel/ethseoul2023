@@ -29,6 +29,12 @@ export class DeployedWallet extends Entity {
     }
   }
 
+  static loadInBlock(id: Bytes): DeployedWallet | null {
+    return changetype<DeployedWallet | null>(
+      store.get_in_block("DeployedWallet", id.toHexString())
+    );
+  }
+
   static load(id: Bytes): DeployedWallet | null {
     return changetype<DeployedWallet | null>(
       store.get("DeployedWallet", id.toHexString())
@@ -37,7 +43,11 @@ export class DeployedWallet extends Entity {
 
   get id(): Bytes {
     let value = this.get("id");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set id(value: Bytes) {
@@ -46,7 +56,11 @@ export class DeployedWallet extends Entity {
 
   get owner(): Bytes {
     let value = this.get("owner");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set owner(value: Bytes) {
@@ -55,7 +69,11 @@ export class DeployedWallet extends Entity {
 
   get walletAddress(): Bytes {
     let value = this.get("walletAddress");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set walletAddress(value: Bytes) {
@@ -64,7 +82,11 @@ export class DeployedWallet extends Entity {
 
   get blockNumber(): BigInt {
     let value = this.get("blockNumber");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set blockNumber(value: BigInt) {
@@ -73,7 +95,11 @@ export class DeployedWallet extends Entity {
 
   get blockTimestamp(): BigInt {
     let value = this.get("blockTimestamp");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
   }
 
   set blockTimestamp(value: BigInt) {
@@ -82,7 +108,11 @@ export class DeployedWallet extends Entity {
 
   get transactionHash(): Bytes {
     let value = this.get("transactionHash");
-    return value!.toBytes();
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
   }
 
   set transactionHash(value: Bytes) {
