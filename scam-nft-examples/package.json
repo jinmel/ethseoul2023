@@ -1,0 +1,36 @@
+{
+  "name": "scam-nft-examples",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@fontsource/akaya-telivigala": "^5.0.2",
+    "@fontsource/sora": "^5.0.2",
+    "@rainbow-me/rainbowkit": "^1.0.1",
+    "next": "^13.4.3",
+    "normalize.css": "^8.0.1",
+    "react": "^18.2.0",
+    "react-confetti": "^6.1.0",
+    "react-dom": "^18.2.0",
+    "react-use": "^17.4.0",
+    "styled-components": "5.3.11",
+    "swiper": "^9.3.2",
+    "typewriter-effect": "^2.20.1",
+    "viem": "~0.3.35",
+    "wagmi": "~1.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.12",
+    "@types/react": "^18.2.6",
+    "@types/styled-components": "^5.1.26",
+    "eslint": "^8.15.0",
+    "eslint-config-next": "^13.4.3",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4"
+  }
+}
