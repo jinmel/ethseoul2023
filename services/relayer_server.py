@@ -9,6 +9,8 @@ import ezkl_lib
 import numpy as np
 import torch
 from web3 import AsyncHTTPProvider, AsyncWeb3
+import rlp
+import eth_utils
 
 from models import SimpleModel
 
@@ -75,9 +77,11 @@ async def check_fraud_address(address):
 
 @app.get("/")
 async def root(rpc: RpcRequest):
-    if rpc.method in ("eth_sendTransaction", "eth_sendRawTransaction"):
+    if rpc.method == "eth_sendRawTransaction":
         if rpc.params:
-            address = rpc.params[0]
+            data = rpc.params[0]
+            data = rlp.decode(data)
+            address = eth_utils.to_hex(data[3])
             score, proof = await check_fraud_address(address)
             if score > 0.5:
                 return {
@@ -95,7 +99,8 @@ async def root(rpc: RpcRequest):
             else:
                 w3 = AsyncWeb3(AsyncHTTPProvider(INFURA_URL))
                 # TODO: Send transaction to the pre-defined contract.
-                result = await w3.eth.send_raw_transaction(proof)
+
+                result = await w3.eth.send_transaction(proof)
                 return result
         else:
             print('Error in message')
