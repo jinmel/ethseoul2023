@@ -144,12 +144,15 @@ async def get_contract_wallet_address(eoa_address):
 @app.post("/")
 async def root(rpc: RpcRequest):
     if rpc.method == "eth_sendRawTransaction":
+        print('Hooking %s method' % rpc.method)
         if rpc.params:
             signed_tx_bytes = eth_utils.to_bytes(hexstr=rpc.params[0])
             decoded_tx = TransactionBuilder().decode(signed_tx_bytes)
             sender = eth_utils.encode_hex(decoded_tx.sender)
             to = eth_utils.to_hex(decoded_tx.to)
+            print('Sender %s to %s' % (sender, to))
             score, proof, input_data = await check_fraud(to)
+            print('score %f input_data %s' % (score, input_data))
             if score > 0.5:
                 return {
                     'jsonrpc': '2.0',
