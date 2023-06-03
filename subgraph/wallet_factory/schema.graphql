@@ -1,0 +1,8 @@
+type DeployedWallet @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  walletAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
