@@ -2,6 +2,19 @@
 
 set -ex
 
+echo "Training model for fraud detection."
+
+python train.py --output_dir ./assets
+
+read -p "Contiunue creating verifier?" -n 1 -r
+
+echo    # (optional) move to a new line
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+fi
+
+cd ./assets
 echo "Starting to generate verifier contract"
 
 ezkl setup -D input.json -M model.onnx --params-path=kzg.params --vk-path=vk.key --pk-path=pk.key --circuit-params-path=circuit.params
