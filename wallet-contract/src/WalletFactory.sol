@@ -20,7 +20,7 @@ contract WalletFactory {
 
     event DeployedWallet(address indexed owner, address indexed walletAddress);
 
-    function deploy(address walletOwner) external onlyOwner {
+    function deploy(address walletOwner) external { //onlyOwner {
         address walletAddress = address(new Wallet(verifier, owner));
 
         emit DeployedWallet(walletOwner, walletAddress);
