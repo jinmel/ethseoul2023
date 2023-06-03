@@ -83,10 +83,15 @@ async def check_fraud(input_data):
     return score, proof
 
 
+MOCK_GRAPH = {
+    '0xAB51D1C24De70aCAC4162F29430a1C567420a9bd': '0x24A3103D0bE9C1a0416BE4824e0732c45f1C7774'
+}
+
+
 async def get_contract_wallet_address(eoa_address):
     """Get contract wallet address from EOA wallet address using the graph
     protocol."""
-    return '0x000000000000000000000000000000000000dEaD'
+    return MOCK_GRAPH[eoa_address]
 
 
 w3 = Web3(HTTPProvider(INFURA_URL))
@@ -136,7 +141,6 @@ class Transaction:
             self.s]
 
 
-
 @app.get("/")
 async def root(rpc: RpcRequest):
     if rpc.method == "eth_sendRawTransaction":
@@ -158,8 +162,7 @@ async def root(rpc: RpcRequest):
                     'id': rpc.id
                 }
             else:
-                contract_address = await get_contract_wallet_address(
-                    transaction.from_)
+                contract_address = await get_contract_wallet_address(transaction.from_)
                 wallet_contract = w3.eth.contract(
                     address=contract_address, abi=contract_abi)
                 tx = wallet_contract.functions.execute(
