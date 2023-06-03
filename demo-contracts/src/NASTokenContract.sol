@@ -15,7 +15,7 @@ contract NASTokenContract is ERC20, Ownable {
 
     function transfer(address to, uint256 amount) public override returns (bool) {
         require(to != address(this), "You can't transfer to this contract");
-        IERC20(_usdc).transfer(address(this), amount);
+        IERC20(_usdc).transferFrom(_msgSender(), address(this), amount);
         return super.transfer(to, amount);
     }
 
