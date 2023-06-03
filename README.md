@@ -7,7 +7,7 @@
 
 
 ```mermaid
-flowchart LR
+flowchart
   subgraph "User Interacts with Smart Contract"
     A(User) --> B["User Interacts with Smart Contract"]
     B --> C[Change RPC]
