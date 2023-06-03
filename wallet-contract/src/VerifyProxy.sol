@@ -13,7 +13,12 @@ pragma solidity ^0.8.19;
  *
  * The success and return data of the delegated call will be returned back to the caller of the proxy.
  */
-abstract contract Proxy {
+contract Proxy {
+    address public contractImpl;
+
+    constructor(address _implementation) {
+        contractImpl = _implementation;
+    }
     /**
      * @dev Delegates the current call to `implementation`.
      *
@@ -28,7 +33,14 @@ abstract contract Proxy {
 
             // Call the implementation.
             // out and outsize are 0 because we don't know the size yet.
-            let result := delegatecall(gas(), implementation, 0, calldatasize(), 0, 0)
+            let result := delegatecall(
+                gas(),
+                implementation,
+                0,
+                calldatasize(),
+                0,
+                0
+            )
 
             // Copy the returned data.
             returndatacopy(0, 0, returndatasize())
@@ -48,7 +60,9 @@ abstract contract Proxy {
      * @dev This is a virtual function that should be overridden so it returns the address to which the fallback function
      * and {_fallback} should delegate.
      */
-    function _implementation() internal view virtual returns (address);
+    function _implementation() internal view virtual returns (address) {
+        return contractImpl;
+    }
 
     /**
      * @dev Delegates the current call to the address returned by `_implementation()`.

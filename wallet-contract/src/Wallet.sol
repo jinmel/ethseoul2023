@@ -64,7 +64,7 @@ contract Wallet {
         bytes32 s
     ) external {
         _verifyUserActions(action, v, r, s);
-        (bool success, ) = action.address.call{value: action.value}(
+        (bool success, ) = action.destContract.call{value: action.value}(
             action.data
         );
         require(success);
