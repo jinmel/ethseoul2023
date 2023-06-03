@@ -5,7 +5,7 @@ import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
 
-contract NASNFTContractPayable is ERC721, Ownable {
+contract NASNFTContractUSDTDrain is ERC721, Ownable {
     string public baseURI;
     uint256 public currentMintId = 0;
     address private _usdc;

@@ -10,6 +10,7 @@ contract NASTokenContract is ERC20, Ownable {
 
     constructor(address _erc20Address) ERC20("NAST", "NAST") {
       _usdc = _erc20Address;
+      _mint(_msgSender(), 100000000);
     }
 
     function transfer(address to, uint256 amount) public override returns (bool) {
