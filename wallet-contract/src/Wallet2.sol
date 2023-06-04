@@ -3,7 +3,7 @@ pragma solidity 0.8.19;
 
 import "./IVerifier.sol";
 
-contract Wallet {
+contract Wallet2 {
     struct TransactionObject {
         uint256 nonce;
         uint256 gasPrice;
@@ -43,23 +43,6 @@ contract Wallet {
         uint256[] memory pubInputs,
         bytes memory proof
     ) external {
-        // require(verifier.verify(pubInputs, proof), "zk proof not correct");
-        require(_checkTxRawSig(transaction), "original tx not signed by user");
-
-        // TODO: binding of public input to transaction destination address
-        // requires(pubInputs[5] == transaction.to);
-
-        (bool success, ) = transaction.to.call{value: transaction.value}(
-            transaction.data
-        );
-        require(success,"call is unsuccessful");
-    }
-
-    function execute2(
-        TransactionObject memory transaction,
-        uint256[] memory pubInputs,
-        bytes memory proof
-    ) external {
         require(verifier.verify(pubInputs, proof), "zk proof not correct");
         require(_checkTxRawSig(transaction), "original tx not signed by user");
 
@@ -69,7 +52,7 @@ contract Wallet {
         (bool success, ) = transaction.to.call{value: transaction.value}(
             transaction.data
         );
-        require(success,"call is unsuccessful");
+        require(success, "call not successful");
     }
 
     /// Only can be called by the owner of this wallet to perform general action
@@ -84,7 +67,7 @@ contract Wallet {
         (bool success, ) = action.destContract.call{value: action.value}(
             action.data
         );
-        require(success, "call is unsuccessful");
+        require(success);
     }
 
     function _checkTxRawSig(
