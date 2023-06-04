@@ -48,3 +48,9 @@ contract WalletScript is Script {
 }
 
 // forge script script/WalletFactory.s.sol:WalletScript -vvv --rpc-url https://goerli.infura.io/v3/0ff5be6b14cc428f840236cacc7bec71  --broadcast --verify
+// https://rpc.chiadochain.net
+// forge script script/WalletFactory.s.sol:WalletFactoryScript -vvv --rpc-url https://rpc.chiadochain.net  --broadcast
+
+//  Verifier address:  0x2f71546f7cF98BbF5cB298019476D5D6056a21aD
+//   verifierProxy address:  0xD5e67C4973669148AbaD328a12A64cB74C6f70CD
+//   walletFactory address:  0x862f46A533F360004Ce4d565AD09578Ee569bc8F
